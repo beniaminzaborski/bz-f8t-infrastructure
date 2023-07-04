@@ -32,7 +32,7 @@ module containerRegistry 'modules/container-registry.bicep' = {
   }
 }
 
-module k8sCluster 'modules/container-registry.bicep' = {
+module k8sCluster 'modules/k8s-cluster.bicep' = {
   name: 'k8sClusterModule'
   params: {
     createdBy: createdBy
@@ -41,6 +41,9 @@ module k8sCluster 'modules/container-registry.bicep' = {
     projectName: projectName
     shortLocation: shortLocation
   }
+  dependsOn: [
+    containerRegistry
+   ]
 }
 
 /*
