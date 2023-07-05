@@ -40,6 +40,7 @@ resource aksCluster 'Microsoft.ContainerService/managedClusters@2023-04-01' = {
     createdBy: createdBy
   }
   properties: {
+    dnsPrefix: 'aks${projectName}'
     agentPoolProfiles: [
       {
         name: 'agentpool'
