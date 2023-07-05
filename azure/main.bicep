@@ -21,17 +21,6 @@ param secondaryComosDbRegion string = 'northeurope'
 
 var createdBy = 'Beniamin'
 
-module containerRegistry 'modules/container-registry.bicep' = {
-  name: 'containerRegistryModule'
-  params: {
-    location: location
-    createdBy: createdBy
-    environment: environment
-    projectName: projectName
-    shortLocation: shortLocation
-  }
-}
-
 module k8sCluster 'modules/k8s-cluster.bicep' = {
   name: 'k8sClusterModule'
   params: {
@@ -41,8 +30,19 @@ module k8sCluster 'modules/k8s-cluster.bicep' = {
     projectName: projectName
     shortLocation: shortLocation
   }
+}
+
+module containerRegistry 'modules/container-registry.bicep' = {
+  name: 'containerRegistryModule'
+  params: {
+    location: location
+    createdBy: createdBy
+    environment: environment
+    projectName: projectName
+    shortLocation: shortLocation
+  }
   dependsOn: [
-    containerRegistry
+    k8sCluster
    ]
 }
 
