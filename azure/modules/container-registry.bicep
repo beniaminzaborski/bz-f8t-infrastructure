@@ -32,7 +32,7 @@ resource containerRegistry 'Microsoft.ContainerRegistry/registries@2022-12-01' =
 }
 
 // Assign permission for AKS to pull images from ACR
-var acrPullRoleDefinitionId = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'bf578b4e-4a63-42a3-8411-be2bb39a5d74')
+var acrPullRoleDefinitionId = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ed3-4680-a7ca-43fe172d538d')
 
 resource aksCluster 'Microsoft.ContainerService/managedClusters@2023-04-01' existing = {
   name: 'aks-${projectName}-${environment}-${shortLocation}'
