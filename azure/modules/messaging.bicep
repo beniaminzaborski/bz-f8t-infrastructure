@@ -26,6 +26,7 @@ resource serviceBusNamespace 'Microsoft.ServiceBus/namespaces@2021-11-01' = {
 }
 
 // Topics
+/*
 resource topicCheckpointAdded 'Microsoft.ServiceBus/namespaces/topics@2021-11-01' = {
   parent: serviceBusNamespace
   name: 'competition-checkpoint-added'
@@ -241,9 +242,10 @@ resource kvServiceBusConnString 'Microsoft.KeyVault/vaults/secrets@2019-09-01' =
 }
 
 output serviceBusSecretUri string = kvServiceBusConnString.properties.secretUri
-
+*/
 
 /* Event Hubs */
+/*
 resource eventHubNamespace 'Microsoft.EventHub/namespaces@2021-11-01' = {
   name: 'evhns-${projectName}-${environment}-${shortLocation}'
   location: location
@@ -282,3 +284,4 @@ resource kvEventHubConnString 'Microsoft.KeyVault/vaults/secrets@2019-09-01' = {
 }
 
 output eventHubSecretUri string = kvEventHubConnString.properties.secretUri
+*/

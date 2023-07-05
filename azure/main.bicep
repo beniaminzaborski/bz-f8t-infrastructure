@@ -57,6 +57,7 @@ module vaults 'modules/vaults.bicep' = {
     createdBy: createdBy
   }
 }
+*/
 
 module observability 'modules/observability.bicep' = {
   name: 'observabilityModule'
@@ -67,11 +68,9 @@ module observability 'modules/observability.bicep' = {
     environment: environment
     createdBy: createdBy
   }
-  dependsOn: [
-    vaults
-  ]   
 }
 
+/*
 module notification 'modules/notification.bicep' = {
   name: 'notificationModule'
   params: {
@@ -85,6 +84,7 @@ module notification 'modules/notification.bicep' = {
     vaults
   ]  
 }
+*/
 
 module databases 'modules/databases.bicep' = {
   name: 'databaseModule'
@@ -96,12 +96,10 @@ module databases 'modules/databases.bicep' = {
     createdBy: createdBy
     dbAdminLogin: dbAdminLogin
     dbAdminPassword: dbAdminPassword
-    secondaryRegion: secondaryComosDbRegion
+    //secondaryRegion: secondaryComosDbRegion
   }
-  dependsOn: [
-    vaults
-  ]  
 }
+
 
 module messaging 'modules/messaging.bicep' = {
   name: 'messagingModule'
@@ -111,12 +109,10 @@ module messaging 'modules/messaging.bicep' = {
     projectName: projectName
     environment: environment
     createdBy: createdBy
-  }
-  dependsOn: [
-    vaults
-  ]  
+  }  
 }
 
+/*
 module storage 'modules/storage.bicep' = {
   name: 'storageModule'
   params: {
