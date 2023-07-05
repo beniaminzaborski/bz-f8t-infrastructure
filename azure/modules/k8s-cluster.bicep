@@ -46,6 +46,7 @@ resource aksCluster 'Microsoft.ContainerService/managedClusters@2023-04-01' = {
         name: 'agentpool'
         count: nodeCount
         minCount: 1
+        maxCount: 3
         enableAutoScaling: true
         osDiskSizeGB: osDiskSizeGB
         vmSize: nodeVmSize
