@@ -62,28 +62,24 @@ resource adminDB 'Microsoft.DBforPostgreSQL/servers/databases@2017-12-01' = {
   parent: postgres
 }
 
-/*
 resource kvAdminDbPostgresConnString 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
   name: 'kv-${projectName}-${environment}-${shortLocation}/ConnectionString-Fott-Administration-Postgres'
   properties: {
     value: 'Server=${postgres.name}.postgres.database.azure.com;Database=${adminDB.name};Port=5432;Ssl Mode=Require;Trust Server Certificate=true;User Id=${dbAdminLogin}@${postgres.name};Password=${dbAdminPassword};'
   }
 }
-*/
 
 resource registrDB 'Microsoft.DBforPostgreSQL/servers/databases@2017-12-01' = {
   name: 'fott_registration'
   parent: postgres
 }
 
-/*
 resource kvRegistrDbPostgresConnString 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
   name: 'kv-${projectName}-${environment}-${shortLocation}/ConnectionString-Fott-Registration-Postgres'
   properties: {
     value: 'Server=${postgres.name}.postgres.database.azure.com;Database=${registrDB.name};Port=5432;Ssl Mode=Require;Trust Server Certificate=true;User Id=${dbAdminLogin}@${postgres.name};Password=${dbAdminPassword};'
   }
 }
-*/
 
 /*
 output adminDbSecretUri string = kvAdminDbPostgresConnString.properties.secretUri

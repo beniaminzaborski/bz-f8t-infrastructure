@@ -230,6 +230,7 @@ resource subsTimeCalculatedEventsToRegistrationService 'Microsoft.ServiceBus/nam
     requiresSession: false
   }
 }
+*/
 
 var serviceBusNamespaceAuthRuleEndpoint = '${serviceBusNamespace.id}/AuthorizationRules/RootManageSharedAccessKey'
 var serviceBusConnString = listKeys(serviceBusNamespaceAuthRuleEndpoint, serviceBusNamespace.apiVersion).primaryConnectionString
@@ -241,8 +242,8 @@ resource kvServiceBusConnString 'Microsoft.KeyVault/vaults/secrets@2019-09-01' =
   }
 }
 
+/*
 output serviceBusSecretUri string = kvServiceBusConnString.properties.secretUri
-*/
 
 /* Event Hubs */
 /*

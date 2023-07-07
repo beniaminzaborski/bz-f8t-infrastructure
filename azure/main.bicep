@@ -46,7 +46,6 @@ module containerRegistry 'modules/container-registry.bicep' = {
    ]
 }
 
-/*
 module vaults 'modules/vaults.bicep' = {
   name: 'vaultModule'
   params: {
@@ -57,7 +56,6 @@ module vaults 'modules/vaults.bicep' = {
     createdBy: createdBy
   }
 }
-*/
 
 module observability 'modules/observability.bicep' = {
   name: 'observabilityModule'
@@ -68,6 +66,9 @@ module observability 'modules/observability.bicep' = {
     environment: environment
     createdBy: createdBy
   }
+  dependsOn: [
+    vaults
+   ]
 }
 
 /*
@@ -98,6 +99,9 @@ module databases 'modules/databases.bicep' = {
     dbAdminPassword: dbAdminPassword
     //secondaryRegion: secondaryComosDbRegion
   }
+  dependsOn: [
+    vaults
+  ]
 }
 
 
@@ -109,7 +113,10 @@ module messaging 'modules/messaging.bicep' = {
     projectName: projectName
     environment: environment
     createdBy: createdBy
-  }  
+  }
+  dependsOn: [
+    vaults
+  ]   
 }
 
 /*
