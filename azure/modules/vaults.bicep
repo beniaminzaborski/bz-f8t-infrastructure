@@ -22,7 +22,15 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
   properties: {
     enabledForTemplateDeployment: true
     tenantId: subscription().tenantId
-    accessPolicies: []
+    accessPolicies: [{
+      objectId: 'f8t-github-actions-sp'
+      tenantId: subscription().tenantId
+      permissions: {
+        secrets: [
+          'get'
+        ]
+      }
+    }]
     sku: {
       name: 'standard'
       family: 'A'
