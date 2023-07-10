@@ -12,6 +12,10 @@ param environment string
 @minLength(2)
 param createdBy string
 
+resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
+  name: 'f8t-github-actions-sp'
+}
+
 resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
   name: 'kv-${projectName}-${environment}-${shortLocation}'
   location: location
@@ -23,7 +27,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
     enabledForTemplateDeployment: true
     tenantId: subscription().tenantId
     accessPolicies: [{
-      objectId: 'f8t-github-actions-sp'
+      objectId: managedIdentity.id
       tenantId: subscription().tenantId
       permissions: {
         secrets: [
