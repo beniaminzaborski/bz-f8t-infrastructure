@@ -27,7 +27,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
     enabledForTemplateDeployment: true
     tenantId: subscription().tenantId
     accessPolicies: [{
-      objectId: managedIdentity.id
+      objectId: managedIdentity.properties.principalId
       tenantId: subscription().tenantId
       permissions: {
         secrets: [
