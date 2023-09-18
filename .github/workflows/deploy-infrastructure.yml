@@ -27,6 +27,7 @@ jobs:
       with:
         scope: subscription
         subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
+        region: ${{ vars.AZURE_LOCATION }}
         template: azure/main.bicep
         parameters: 'environment=${{ github.event.inputs.environment }} location=${{ vars.AZURE_LOCATION }} dbAdminLogin=${{ secrets.DB_ADMIN_LOGIN }} dbAdminPassword=${{ secrets.DB_ADMIN_PASSWORD }} secondaryComosDbRegion=${{ vars.SECONDARY_COSMOSDB_REGION }}'
         failOnStdErr: false
