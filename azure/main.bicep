@@ -1,8 +1,13 @@
+@description('Environment name')
+@minLength(2)
+@allowed(['dev', 'qa', 'stg', 'prd'])
+param environment string
+
 @description('Azure region')
-param location string = resourceGroup().location
+param location string
 var shortLocation = substring(location, 0, 6)
 
-@description('Project name as a prefix for all resources')
+@description('Project name')
 @minLength(3)
 param projectName string = 'f8t'
 
@@ -12,17 +17,21 @@ param dbAdminLogin string = 'postgres'
 @secure()
 param dbAdminPassword string
 
-@description('Environment name')
-@minLength(2)
-@allowed(['dev', 'qa', 'stg', 'prd'])
-param environment string
-
+@description('Azure secondary region for CosmosDB')
 param secondaryComosDbRegion string = 'northeurope'
 
 var createdBy = 'Beniamin'
 
+targetScope = 'subscription'
+
+resource resourceGroup 'Microsoft.Resources/resourceGroups@2023-07-01' = {
+  name: 'rg-${projectName}-${environment}-${shortLocation}'
+  location: location
+}
+
 module k8sCluster 'modules/k8s-cluster.bicep' = {
   name: 'k8sClusterModule'
+  scope: resourceGroup
   params: {
     createdBy: createdBy
     environment: environment
@@ -34,6 +43,7 @@ module k8sCluster 'modules/k8s-cluster.bicep' = {
 
 module containerRegistry 'modules/container-registry.bicep' = {
   name: 'containerRegistryModule'
+  scope: resourceGroup
   params: {
     location: location
     createdBy: createdBy
@@ -48,6 +58,7 @@ module containerRegistry 'modules/container-registry.bicep' = {
 
 module vaults 'modules/vaults.bicep' = {
   name: 'vaultModule'
+  scope: resourceGroup
   params: {
     location: location
     shortLocation: shortLocation
@@ -59,6 +70,7 @@ module vaults 'modules/vaults.bicep' = {
 
 module observability 'modules/observability.bicep' = {
   name: 'observabilityModule'
+  scope: resourceGroup
   params: {
     location: location
     shortLocation: shortLocation
@@ -89,6 +101,7 @@ module notification 'modules/notification.bicep' = {
 
 module databases 'modules/databases.bicep' = {
   name: 'databaseModule'
+  scope: resourceGroup
   params: {
     location: location
     shortLocation: shortLocation
@@ -107,6 +120,7 @@ module databases 'modules/databases.bicep' = {
 
 module messaging 'modules/messaging.bicep' = {
   name: 'messagingModule'
+  scope: resourceGroup
   params: {
     location: location
     shortLocation: shortLocation
