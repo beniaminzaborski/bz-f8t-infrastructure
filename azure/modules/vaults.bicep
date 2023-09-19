@@ -13,7 +13,7 @@ param environment string
 param createdBy string
 
 resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
-  name: 'f8t-github-actions-sp'
+  name: 'f8t-github-actions'
 }
 
 resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
