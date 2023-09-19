@@ -21,6 +21,6 @@ To run this project from GitHub actions:
 az ad sp create-for-rbac --name "f8t-github-actions" --sdk-auth --role owner --scopes /subscriptions/{subscriptions-id}
 ```
 
-* Set the values of rest secrets/variables in GitHub such as: AZURE_RG (name of the resoure group in Azure where infrastucture will be deployed), AZURE_SUBSCRIPTION (id of Azure subscription), DB_ADMIN_LOGIN (login for database), DB_ADMIN_PASSWORD (password for database)
+* Set the values of rest secrets/variables in GitHub such as: AZURE_SUBSCRIPTION (id of Azure subscription), DB_ADMIN_LOGIN (login for database), DB_ADMIN_PASSWORD (password for database)
 
 * Run GitHub workflow and pass the name of environment (dev, qa, stg, prod)
