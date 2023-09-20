@@ -6,7 +6,7 @@
 * [Technologies](#technologies)
 * [Setup](#setup)
 * [Post-run configuration](#post-run-configuration)
-* [Repositories of related services](#repositories-of-related-services)
+* [F8T repositories](#f8t-repositories)
 
 ## General info
 F8T is version of Feet On The Tarmac (FOTT) project for K8s. Originally FOTT project was built on Azure PaaS approach. It means was strongly related to Azure platform services such as Azure Functions for example. F8T based on the approach where all services are contenerizable and runnable in K8S.
@@ -42,5 +42,6 @@ After deploying your resources to Azure you must do manual actions to allow acce
 Do below actions:
 * In your Azure KeyVault resource assign 'get' secrets permissions for you service principal (for example "f8t-github-actions")
 
-## Repositories of related services
-* Administration service: [github.com/beniaminzaborski/bz-f8t-administration](https://github.com/beniaminzaborski/bz-f8t-administration)
+## F8T repositories
+* Infrastructure (this one): [github.com/beniaminzaborski/bz-f8t-infrastructure](https://github.com/beniaminzaborski/bz-f8t-infrastructure)
+* Administration: [github.com/beniaminzaborski/bz-f8t-administration](https://github.com/beniaminzaborski/bz-f8t-administration)
