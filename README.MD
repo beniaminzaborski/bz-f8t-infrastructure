@@ -1,4 +1,4 @@
-# F8T - Infrastructure
+# F8T (Feet On The Tarmac) - Infrastructure
 ![Project logo](./docs/f8t-logo.png)
 
 ## Table of contents
