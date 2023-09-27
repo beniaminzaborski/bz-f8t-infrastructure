@@ -1,6 +1,6 @@
 @description('Environment name')
 @minLength(2)
-@allowed(['dev', 'uat', 'prd'])
+@allowed(['dev', 'uat', 'prod'])
 param environment string
 
 @description('Azure region')
