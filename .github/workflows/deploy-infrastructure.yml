@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Environment name. Allowed values: dev, qa, stg, prod'
+        description: 'Environment name. Allowed values: dev, uat, prod'
         required: true
         default: 'dev'
 
