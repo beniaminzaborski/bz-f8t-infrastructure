@@ -61,6 +61,7 @@ module containerRegistry 'modules/container-registry.bicep' = {
     environment: environment
     projectName: projectName
     shortLocation: shortLocation
+    aksResourceGroup: envResourceGroup
   }
   dependsOn: [
     k8sCluster

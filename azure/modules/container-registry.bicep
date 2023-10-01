@@ -12,6 +12,8 @@ param environment string
 @minLength(2)
 param createdBy string
 
+param aksResourceGroup object
+
 resource containerRegistry 'Microsoft.ContainerRegistry/registries@2022-12-01' = {
   name: 'cr${projectName}${environment}${shortLocation}'
   location: location
@@ -36,6 +38,7 @@ var acrPullRoleDefinitionId = subscriptionResourceId('Microsoft.Authorization/ro
 
 resource aksCluster 'Microsoft.ContainerService/managedClusters@2023-04-01' existing = {
   name: 'aks-${projectName}-${environment}-${shortLocation}'
+  scope: resourceGroup(aksResourceGroup.name)
 }
 
 resource acrPullRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
