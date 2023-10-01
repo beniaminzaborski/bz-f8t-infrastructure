@@ -24,14 +24,25 @@ var createdBy = 'Beniamin'
 
 targetScope = 'subscription'
 
-resource resourceGroup 'Microsoft.Resources/resourceGroups@2023-07-01' = {
+// Add resource group for shared resources for non-prod environment:
+// Resource group name: rg-f8t-shared-nonprod-westeu for 'dev' and 'qa' environments
+// Resource group name: rg-f8t-shared-prod-westeu for 'uat' and 'prod' environments
+// Put Azure Container Registry to those shared resource groups!
+var sharedResourceGroupName = environment == 'uat' || environment == 'prod' ? 'rg-${projectName}-shared-prod-${shortLocation}' : 'rg-${projectName}-shared-nonprod-${shortLocation}'
+
+resource sharedResourceGroup 'Microsoft.Resources/resourceGroups@2023-07-01' = {
+  name: sharedResourceGroupName
+  location: location
+}
+
+resource envResourceGroup 'Microsoft.Resources/resourceGroups@2023-07-01' = {
   name: 'rg-${projectName}-${environment}-${shortLocation}'
   location: location
 }
 
 module k8sCluster 'modules/k8s-cluster.bicep' = {
   name: 'k8sClusterModule'
-  scope: resourceGroup
+  scope: envResourceGroup
   params: {
     createdBy: createdBy
     environment: environment
@@ -43,7 +54,7 @@ module k8sCluster 'modules/k8s-cluster.bicep' = {
 
 module containerRegistry 'modules/container-registry.bicep' = {
   name: 'containerRegistryModule'
-  scope: resourceGroup
+  scope: sharedResourceGroup
   params: {
     location: location
     createdBy: createdBy
@@ -58,7 +69,7 @@ module containerRegistry 'modules/container-registry.bicep' = {
 
 module vaults 'modules/vaults.bicep' = {
   name: 'vaultModule'
-  scope: resourceGroup
+  scope: envResourceGroup
   params: {
     location: location
     shortLocation: shortLocation
@@ -70,7 +81,7 @@ module vaults 'modules/vaults.bicep' = {
 
 module observability 'modules/observability.bicep' = {
   name: 'observabilityModule'
-  scope: resourceGroup
+  scope: envResourceGroup
   params: {
     location: location
     shortLocation: shortLocation
@@ -101,7 +112,7 @@ module notification 'modules/notification.bicep' = {
 
 module databases 'modules/databases.bicep' = {
   name: 'databaseModule'
-  scope: resourceGroup
+  scope: envResourceGroup
   params: {
     location: location
     shortLocation: shortLocation
@@ -120,7 +131,7 @@ module databases 'modules/databases.bicep' = {
 
 module messaging 'modules/messaging.bicep' = {
   name: 'messagingModule'
-  scope: resourceGroup
+  scope: envResourceGroup
   params: {
     location: location
     shortLocation: shortLocation
