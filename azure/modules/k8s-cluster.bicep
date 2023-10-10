@@ -56,3 +56,15 @@ resource aksCluster 'Microsoft.ContainerService/managedClusters@2023-04-01' = {
     ]
   }
 }
+
+// Assign permission for AKS to pull images from ACR
+var acrPullRoleDefinitionId = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ed3-4680-a7ca-43fe172d538d')
+
+resource acrPullRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(resourceGroup().id, aksCluster.id, acrPullRoleDefinitionId)
+  properties: {
+    principalId: aksCluster.properties.identityProfile.kubeletidentity.objectId
+    principalType: 'ServicePrincipal'
+    roleDefinitionId: acrPullRoleDefinitionId
+  }
+}
