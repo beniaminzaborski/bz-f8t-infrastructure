@@ -34,13 +34,7 @@ az ad sp create-for-rbac --name "f8t-github-actions" --sdk-auth --role owner --s
 
 * Define GitHub Actions variable named AZURE_LOCATION and put there correct name of Azure region where do you want to deploy your resources
 
-* Run GitHub workflow and pass the name of environment (dev, qa, stg, prod)
-
-## Post-run configuration
-After deploying your resources to Azure you must do manual actions to allow access for your services to Azure resources.
-
-Do below actions:
-* In your Azure KeyVault resource assign 'get' secrets permissions for you service principal (for example "f8t-github-actions")
+* Run GitHub workflow and pass the name of environment (dev, uat, prod)
 
 ## F8T repositories
 * Infrastructure (this one): [github.com/beniaminzaborski/bz-f8t-infrastructure](https://github.com/beniaminzaborski/bz-f8t-infrastructure)
