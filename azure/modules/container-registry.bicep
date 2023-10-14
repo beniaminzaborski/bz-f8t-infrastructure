@@ -14,8 +14,12 @@ param createdBy string
 
 param aksPrincipalId string
 
+param isSharedProdResourceGroup bool
+
+var containerRegistryName = isSharedProdResourceGroup ? 'cr${projectName}spr${environment}${shortLocation}' : 'cr${projectName}snpr${environment}${shortLocation}'
+
 resource containerRegistry 'Microsoft.ContainerRegistry/registries@2022-12-01' = {
-  name: 'cr${projectName}${environment}${shortLocation}'
+  name: containerRegistryName
   location: location
   sku: {
     name: 'Basic'

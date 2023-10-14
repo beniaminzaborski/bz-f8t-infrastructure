@@ -28,7 +28,8 @@ targetScope = 'subscription'
 // Resource group name: rg-f8t-shared-nonprod-westeu for 'dev' and 'qa' environments
 // Resource group name: rg-f8t-shared-prod-westeu for 'uat' and 'prod' environments
 // Put Azure Container Registry to those shared resource groups!
-var sharedResourceGroupName = environment == 'uat' || environment == 'prod' ? 'rg-${projectName}-shared-prod-${shortLocation}' : 'rg-${projectName}-shared-nonprod-${shortLocation}'
+var isSharedProdResourceGroup = environment == 'uat' || environment == 'prod' 
+var sharedResourceGroupName = isSharedProdResourceGroup ? 'rg-${projectName}-shared-prod-${shortLocation}' : 'rg-${projectName}-shared-nonprod-${shortLocation}'
 
 resource sharedResourceGroup 'Microsoft.Resources/resourceGroups@2023-07-01' = {
   name: sharedResourceGroupName
@@ -62,6 +63,7 @@ module containerRegistry 'modules/container-registry.bicep' = {
     projectName: projectName
     shortLocation: shortLocation
     aksPrincipalId: k8sCluster.outputs.aksPrincipalId
+    isSharedProdResourceGroup: isSharedProdResourceGroup
   }
   dependsOn: [
     k8sCluster
