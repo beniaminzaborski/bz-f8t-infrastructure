@@ -9,9 +9,6 @@ param shortLocation string
 @minLength(2)
 param createdBy string
 
-
-// TODO Create Hub virtual network
-
 resource hubVNet 'Microsoft.Network/virtualNetworks@2023-05-01' = {
   name: 'vnet-hub-${projectName}-${shortLocation}'
   location: location
@@ -40,9 +37,3 @@ resource hubVNet 'Microsoft.Network/virtualNetworks@2023-05-01' = {
     ]
   }
 }
-
-// TODO: Create a subnet in Hub netowrk for Azure Firewall
-
-
-// TODO: Create a subnet in Hub network for Azure Bastion
-
