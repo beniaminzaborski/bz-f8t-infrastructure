@@ -36,6 +36,17 @@ resource sharedResourceGroup 'Microsoft.Resources/resourceGroups@2023-07-01' = {
   location: location
 }
 
+module network 'modules/networking.bicep' = {
+  name: 'networkModule'
+  scope: sharedResourceGroup
+  params: {
+    createdBy: createdBy
+    location: location
+    projectName: projectName
+    shortLocation: shortLocation
+  }
+}
+
 resource envResourceGroup 'Microsoft.Resources/resourceGroups@2023-07-01' = {
   name: 'rg-${projectName}-${environment}-${shortLocation}'
   location: location
