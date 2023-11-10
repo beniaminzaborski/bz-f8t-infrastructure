@@ -30,7 +30,7 @@ targetScope = 'subscription'
 // 3. Shared resource group for production environments such as uat or prod: rg-f8t-shared-prod-westeu
 
 var isEnvProdResourceGroup = environment == 'uat' || environment == 'prod'
-var envSharedResourceGroupNameSuffix = isEnvProdResourceGroup ? 'shared-prod' : 'shared-nonprod'
+var envSharedResourceGroupNameSuffix = isEnvProdResourceGroup ? 'shprod' : 'shnonprod'
 var envSharedResourceGroupName = 'rg-${projectName}-${envSharedResourceGroupNameSuffix}-${shortLocation}'
 
 var envResourceGroupName = 'rg-${projectName}-${environment}-${shortLocation}'
