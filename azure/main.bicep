@@ -24,21 +24,36 @@ var createdBy = 'Beniamin'
 
 targetScope = 'subscription'
 
-// Add resource group for shared resources for non-prod environment:
-// Resource group name: rg-f8t-shared-nonprod-westeu for 'dev' and 'qa' environments
-// Resource group name: rg-f8t-shared-prod-westeu for 'uat' and 'prod' environments
-// Put Azure Container Registry to those shared resource groups!
-var isSharedProdResourceGroup = environment == 'uat' || environment == 'prod' 
-var sharedResourceGroupName = isSharedProdResourceGroup ? 'rg-${projectName}-shared-prod-${shortLocation}' : 'rg-${projectName}-shared-nonprod-${shortLocation}'
+// Resource groups:
+// 1. Shared resource group for hub network resources: rg-f8t-hub-westeu
+// 2. Shared resource group for non production environments such as dev or qa: rg-f8t-shared-nonprod-westeu
+// 3. Shared resource group for production environments such as uat or prod: rg-f8t-shared-prod-westeu
 
-resource sharedResourceGroup 'Microsoft.Resources/resourceGroups@2023-07-01' = {
-  name: sharedResourceGroupName
+var isEnvProdResourceGroup = environment == 'uat' || environment == 'prod'
+var envSharedResourceGroupNameSuffix = isEnvProdResourceGroup ? 'shared-prod' : 'shared-nonprod'
+var envSharedResourceGroupName = 'rg-${projectName}-${envSharedResourceGroupNameSuffix}-${shortLocation}'
+
+var envResourceGroupName = 'rg-${projectName}-${environment}-${shortLocation}'
+
+resource hubResourceGroup 'Microsoft.Resources/resourceGroups@2023-07-01' = {
+  name: 'rg-${projectName}-hub-${shortLocation}'
   location: location
 }
 
-module network 'modules/networking.bicep' = {
-  name: 'networkModule'
-  scope: sharedResourceGroup
+resource envSharedResourceGroup 'Microsoft.Resources/resourceGroups@2023-07-01' = {
+  name: envSharedResourceGroupName
+  location: location
+}
+
+resource envResourceGroup 'Microsoft.Resources/resourceGroups@2023-07-01' = {
+  name: envResourceGroupName
+  location: location
+}
+
+/*
+module hubNetwork 'modules/hub-networking.bicep' = {
+  name: 'hubNetworkModule'
+  scope: hubResourceGroup
   params: {
     createdBy: createdBy
     location: location
@@ -47,10 +62,17 @@ module network 'modules/networking.bicep' = {
   }
 }
 
-resource envResourceGroup 'Microsoft.Resources/resourceGroups@2023-07-01' = {
-  name: 'rg-${projectName}-${environment}-${shortLocation}'
-  location: location
+module spokeNetwork 'modules/spoke-networking.bicep' = {
+  name: 'spokeNetworkModule'
+  scope: envResourceGroup
+  params: {
+    createdBy: createdBy
+    location: location
+    projectName: projectName
+    shortLocation: shortLocation
+  }
 }
+*/
 
 module k8sCluster 'modules/k8s-cluster.bicep' = {
   name: 'k8sClusterModule'
@@ -66,15 +88,15 @@ module k8sCluster 'modules/k8s-cluster.bicep' = {
 
 module containerRegistry 'modules/container-registry.bicep' = {
   name: 'containerRegistryModule'
-  scope: sharedResourceGroup
+  scope: envSharedResourceGroup
   params: {
     location: location
     createdBy: createdBy
-    environment: environment
+    environment: envSharedResourceGroupNameSuffix
     projectName: projectName
     shortLocation: shortLocation
     aksPrincipalId: k8sCluster.outputs.aksPrincipalId
-    isSharedProdResourceGroup: isSharedProdResourceGroup
+    isSharedProdResourceGroup: isEnvProdResourceGroup
   }
   dependsOn: [
     k8sCluster
@@ -83,12 +105,12 @@ module containerRegistry 'modules/container-registry.bicep' = {
 
 module vaults 'modules/vaults.bicep' = {
   name: 'vaultModule'
-  scope: envResourceGroup
+  scope: envSharedResourceGroup
   params: {
     location: location
     shortLocation: shortLocation
     projectName: projectName
-    environment: environment
+    environment: envSharedResourceGroupNameSuffix
     createdBy: createdBy
   }
 }
