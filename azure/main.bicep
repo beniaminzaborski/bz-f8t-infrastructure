@@ -26,24 +26,17 @@ targetScope = 'subscription'
 
 // Resource groups:
 // 1. Shared resource group for hub network resources: rg-f8t-hub-westeu
-// 2. Shared resource group for non production environments such as dev or qa: rg-f8t-shared-nonprod-westeu
-// 3. Shared resource group for production environments such as uat or prod: rg-f8t-shared-prod-westeu
+// 2. Shared resource group for non-production environments such as dev or qa: rg-f8t-nonprod-westeu
+// 3. Shared resource group for production environments such as uat or prod: rg-f8t-prod-westeu
 
-var isEnvProdResourceGroup = environment == 'uat' || environment == 'prod'
-var envSharedResourceGroupNameSuffix = isEnvProdResourceGroup ? 'shprod' : 'shnonprod'
-var envSharedResourceGroupName = 'rg-${projectName}-${envSharedResourceGroupNameSuffix}-${shortLocation}'
+var isProdResourceGroup = environment == 'uat' || environment == 'prod'
+var envResourceGroupSuffix = isProdResourceGroup ? 'prod' : 'nonprod'
+var envResourceGroupName = 'rg-${projectName}-${envResourceGroupSuffix}-${shortLocation}'
 
-var envResourceGroupName = 'rg-${projectName}-${environment}-${shortLocation}'
-
-resource hubResourceGroup 'Microsoft.Resources/resourceGroups@2023-07-01' = {
-  name: 'rg-${projectName}-hub-${shortLocation}'
-  location: location
-}
-
-resource envSharedResourceGroup 'Microsoft.Resources/resourceGroups@2023-07-01' = {
-  name: envSharedResourceGroupName
-  location: location
-}
+// resource hubResourceGroup 'Microsoft.Resources/resourceGroups@2023-07-01' = {
+//   name: 'rg-${projectName}-hub-${shortLocation}'
+//   location: location
+// }
 
 resource envResourceGroup 'Microsoft.Resources/resourceGroups@2023-07-01' = {
   name: envResourceGroupName
@@ -88,15 +81,15 @@ module k8sCluster 'modules/k8s-cluster.bicep' = {
 
 module containerRegistry 'modules/container-registry.bicep' = {
   name: 'containerRegistryModule'
-  scope: envSharedResourceGroup
+  scope: envResourceGroup
   params: {
     location: location
     createdBy: createdBy
-    environment: envSharedResourceGroupNameSuffix
+    environment: envResourceGroupSuffix
     projectName: projectName
     shortLocation: shortLocation
     aksPrincipalId: k8sCluster.outputs.aksPrincipalId
-    isSharedProdResourceGroup: isEnvProdResourceGroup
+    isProdResourceGroup: isProdResourceGroup
   }
   dependsOn: [
     k8sCluster
@@ -105,12 +98,12 @@ module containerRegistry 'modules/container-registry.bicep' = {
 
 module vaults 'modules/vaults.bicep' = {
   name: 'vaultModule'
-  scope: envSharedResourceGroup
+  scope: envResourceGroup
   params: {
     location: location
     shortLocation: shortLocation
     projectName: projectName
-    environment: envSharedResourceGroupNameSuffix
+    environment: envResourceGroupSuffix
     createdBy: createdBy
   }
 }
