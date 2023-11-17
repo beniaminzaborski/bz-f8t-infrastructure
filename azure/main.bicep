@@ -85,7 +85,6 @@ module containerRegistry 'modules/container-registry.bicep' = {
   params: {
     location: location
     createdBy: createdBy
-    environment: envResourceGroupSuffix
     projectName: projectName
     shortLocation: shortLocation
     aksPrincipalId: k8sCluster.outputs.aksPrincipalId
@@ -103,7 +102,7 @@ module vaults 'modules/vaults.bicep' = {
     location: location
     shortLocation: shortLocation
     projectName: projectName
-    environment: envResourceGroupSuffix
+    environment: environment
     createdBy: createdBy
   }
 }

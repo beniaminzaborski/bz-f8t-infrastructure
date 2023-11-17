@@ -7,16 +7,15 @@ param location string
 param shortLocation string
 
 @minLength(2)
-param environment string
-
-@minLength(2)
 param createdBy string
 
 param aksPrincipalId string
 
 param isProdResourceGroup bool
 
-var containerRegistryName = isProdResourceGroup ? 'cr${projectName}prod${environment}${shortLocation}' : 'cr${projectName}nprd${environment}${shortLocation}'
+var environment = isProdResourceGroup ? 'prod' : 'nonprod'
+
+var containerRegistryName = isProdResourceGroup ? 'cr${projectName}${environment}${shortLocation}' : 'cr${projectName}${environment}${shortLocation}'
 
 resource containerRegistry 'Microsoft.ContainerRegistry/registries@2022-12-01' = {
   name: containerRegistryName
