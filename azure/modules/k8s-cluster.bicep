@@ -25,6 +25,106 @@ param environment string
 @minLength(2)
 param createdBy string
 
+resource aksPublicIp 'Microsoft.Network/publicIPAddresses@2023-05-01' = {
+  name: 'pip-${projectName}-${environment}-${shortLocation}'
+  location: location
+  tags: {
+    environment: environment
+    createdBy: createdBy
+  }
+  sku: {
+    name: 'Basic'
+  }
+  properties: {
+    publicIPAllocationMethod: 'Static'
+  }
+}
+
+resource aksVnet 'Microsoft.Network/virtualNetworks@2023-05-01' = {
+  name: 'vnet-aks-${projectName}-${environment}-${shortLocation}'
+  location: location
+  tags: {
+    environment: environment
+    createdBy: createdBy
+  }
+  properties: {
+    addressSpace: {
+      addressPrefixes: [
+        '10.0.0.0/16'
+      ]
+    }
+    subnets: [
+      {
+        name: 'agwSubnet'
+        properties: {
+          addressPrefix: '10.0.0.0/24'
+        }
+      }
+    ]
+  }
+}
+
+resource appGateway 'Microsoft.Network/applicationGateways@2023-05-01' = {
+  name: 'agw-${projectName}-${environment}-${shortLocation}'
+  location: location
+  tags: {
+    environment: environment
+    createdBy: createdBy
+  }
+  properties: {
+    sku: {
+      name: 'Standard_v2'
+      tier: 'Standard_v2'
+    }
+    frontendIPConfigurations: [
+      {
+        name: 'publicFrontendIpConfig'
+        id: aksPublicIp.id
+      }
+    ]
+    frontendPorts: [
+      {
+        name: 'frontendPortConfig'
+        properties: {
+          port: 80
+        }
+      }
+    ]
+    gatewayIPConfigurations: [
+      {
+        name: 'gatewayIpConfig'
+        properties: {
+          subnet: {
+            id: aksVnet.properties.subnets[0].id
+          }
+        }
+      }
+    ]
+    backendAddressPools: [
+      {
+        name: 'backendPool'
+        properties: {}
+      }
+    ]
+    backendHttpSettingsCollection: [
+      {
+        name: 'httpSetting'
+        properties: {
+          port: 80
+          protocol: 'Http'
+          cookieBasedAffinity: 'Disabled'
+          pickHostNameFromBackendAddress: false
+          requestTimeout: 20
+        }
+      }
+    ]
+    autoscaleConfiguration: {
+      minCapacity: 0
+      maxCapacity: 3
+    }
+  }
+}
+
 resource aksCluster 'Microsoft.ContainerService/managedClusters@2023-04-01' = {
   name: 'aks-${projectName}-${environment}-${shortLocation}'
   location: location
