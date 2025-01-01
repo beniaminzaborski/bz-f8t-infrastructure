@@ -9,16 +9,12 @@ param shortLocation string
 @minLength(2)
 param createdBy string
 
-param aksPrincipalId string
-
 param isProdResourceGroup bool
 
 var environment = isProdResourceGroup ? 'prod' : 'nonprod'
 
-var containerRegistryName = isProdResourceGroup ? 'cr${projectName}${environment}${shortLocation}' : 'cr${projectName}${environment}${shortLocation}'
-
 resource containerRegistry 'Microsoft.ContainerRegistry/registries@2022-12-01' = {
-  name: containerRegistryName
+  name: 'cr${projectName}${environment}${shortLocation}'
   location: location
   sku: {
     name: 'Basic'
@@ -36,15 +32,4 @@ resource containerRegistry 'Microsoft.ContainerRegistry/registries@2022-12-01' =
   }
 }
 
-// Assign permission for AKS to pull images from ACR
-var acrPullRoleDefinitionId = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ed3-4680-a7ca-43fe172d538d')
-
-resource acrPullRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(projectName, environment, location, aksPrincipalId, acrPullRoleDefinitionId)
-  scope: containerRegistry
-  properties: {
-    principalId: aksPrincipalId
-    principalType: 'ServicePrincipal'
-    roleDefinitionId: acrPullRoleDefinitionId
-  }
-}
+output containerRegistryName string =  containerRegistry.name
