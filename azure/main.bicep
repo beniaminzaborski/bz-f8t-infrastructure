@@ -127,9 +127,9 @@ module messaging 'modules/messaging.bicep' = {
   ]   
 }
 
-/*
 module storage 'modules/storage.bicep' = {
   name: 'storageModule'
+  scope: envResourceGroup
   params: {
     location: location
     shortLocation: shortLocation
@@ -141,7 +141,6 @@ module storage 'modules/storage.bicep' = {
     vaults
   ]  
 }
-*/
 
 module apps 'modules/container-apps.bicep' = {
   name: 'appsModule'

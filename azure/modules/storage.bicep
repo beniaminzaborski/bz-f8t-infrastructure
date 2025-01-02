@@ -12,7 +12,7 @@ param environment string
 @minLength(2)
 param createdBy string
 
-resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
+resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   name: 'st${projectName}${environment}${shortLocation}'
   location: location
   kind: 'StorageV2'
