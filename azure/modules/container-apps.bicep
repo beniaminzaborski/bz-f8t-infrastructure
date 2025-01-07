@@ -144,7 +144,7 @@ resource adminContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
       containers: [
         {
           name: 'f8t-admin'
-          image: '${containerRegistry.properties.loginServer}/bz-f8t-administration-webapi:latest'
+          image: '${containerRegistry.properties.loginServer}/bz-f8t-admin:latest'
           env: [
             {
               name: 'ASPNETCORE_ENVIRONMENT'
@@ -157,6 +157,87 @@ resource adminContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
             {
               name: 'ConnectionStrings__AzureServiceBus'
               secretRef: 'connectionstrings-azureservicebus-kv'
+            }
+            {
+              name: 'ConnectionStrings__ApplicationInsights'
+              secretRef: 'connectionstrings-applicationinsights-kv'
+            }
+          ]
+          resources: {
+            cpu: json('.25')
+            memory: '0.5Gi'
+          }
+        }
+      ]
+      scale: {
+        minReplicas: 1
+        maxReplicas: 3
+        rules: [
+          {
+            name: 'http-requests'
+            http: {
+              metadata: {
+                concurrentRequests: '10'
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
+
+// Create f8t-chatbot service Container App
+resource chatbotContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
+  name: 'ca-${projectName}-chatbot-${environment}-${shortLocation}'
+  location: location
+  identity: {
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${uai.id}': {}
+    }
+  }
+  tags: {
+    createdBy: createdBy
+    environment: environment
+  }
+  properties: {
+    managedEnvironmentId: containerAppEnv.id
+    configuration: {
+      secrets: [
+        {
+          name: 'connectionstrings-applicationinsights-kv'
+          keyVaultUrl: 'https://${keyVault.name}.vault.azure.net/secrets/ConnectionString-Fott-AppInsights'
+          identity: uai.id
+        }
+      ]
+      ingress: {
+        external: true
+        targetPort: 8080
+        traffic: [
+          {
+            latestRevision: true
+            weight: 100
+          }
+        ]
+      }
+      registries: [
+        {
+          identity: uai.id
+          server: containerRegistry.properties.loginServer
+        }
+      ]
+      activeRevisionsMode: 'Single'
+    }
+    template: {
+      containers: [
+        {
+          name: 'f8t-admin'
+          image: '${containerRegistry.properties.loginServer}/bz-f8t-chatbot:latest'
+          env: [
+            {
+              name: 'ASPNETCORE_ENVIRONMENT'
+              value: 'Development'
             }
             {
               name: 'ConnectionStrings__ApplicationInsights'
