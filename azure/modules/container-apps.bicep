@@ -22,9 +22,9 @@ var acrPullRole = subscriptionResourceId('Microsoft.Authorization/roleDefinition
 // Define RBAC role to get secret from Key Vault
 var kvGetSecretRole = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')
 
-// Create user assigned identity for f8t-admin container app
+// Create user assigned identity for all container apps
 resource uai 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' = {
-  name: 'id-${projectName}-admin-${environment}-${shortLocation}'
+  name: 'id-${projectName}-${environment}-${shortLocation}'
   location: location
   tags: {
     createdBy: createdBy
@@ -213,7 +213,7 @@ resource chatbotContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
       ]
       ingress: {
         external: true
-        targetPort: 8080
+        targetPort: 8081
         traffic: [
           {
             latestRevision: true
@@ -232,7 +232,7 @@ resource chatbotContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
     template: {
       containers: [
         {
-          name: 'f8t-admin'
+          name: 'f8t-chatbot'
           image: '${containerRegistry.properties.loginServer}/bz-f8t-chatbot:latest'
           env: [
             {
