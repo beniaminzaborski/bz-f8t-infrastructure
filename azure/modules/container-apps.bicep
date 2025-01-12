@@ -22,9 +22,9 @@ var acrPullRole = subscriptionResourceId('Microsoft.Authorization/roleDefinition
 // Define RBAC role to get secret from Key Vault
 var kvGetSecretRole = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')
 
-// Create user assigned identity for all container apps
-resource uai 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' = {
-  name: 'id-${projectName}-${environment}-${shortLocation}'
+// Create user assigned identity for admin container apps
+resource adminAppUai 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' = {
+  name: 'id-${projectName}-admin-${environment}-${shortLocation}'
   location: location
   tags: {
     createdBy: createdBy
@@ -32,18 +32,40 @@ resource uai 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-previe
   }
 }
 
+// Create user assigned identity for chatbot container apps
+resource chatbotAppUai 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' = {
+  name: 'id-${projectName}-chatbot-${environment}-${shortLocation}'
+  location: location
+  tags: {
+    createdBy: createdBy
+    environment: environment
+  }
+}
+
+
 // Get existing container registry by name
 resource containerRegistry 'Microsoft.ContainerRegistry/registries@2022-12-01' existing = {
   name: containerRegistryName
 }
 
 // Add RBAC role for user assigned inentity to pull image from Container Registry
-resource uaiRbac 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(containerRegistry.id, uai.id, acrPullRole)
+resource adminAppUaiRegistryRbac 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(containerRegistry.id, adminAppUai.id, acrPullRole)
   scope: containerRegistry
   properties: {
     roleDefinitionId: acrPullRole
-    principalId: uai.properties.principalId
+    principalId: adminAppUai.properties.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+// Add RBAC role for user assigned inentity to pull image from Container Registry
+resource chatbotAppUaiRegistryRbac 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(containerRegistry.id, chatbotAppUai.id, acrPullRole)
+  scope: containerRegistry
+  properties: {
+    roleDefinitionId: acrPullRole
+    principalId: chatbotAppUai.properties.principalId
     principalType: 'ServicePrincipal'
   }
 }
@@ -54,12 +76,23 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
 }
 
 // Add RBAC role for user assigned inentity to get secret from Key Vault
-resource keyVaultRbac 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(keyVault.id, uai.id, kvGetSecretRole)
+resource adminAppUaiKeyVaultRbac 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(keyVault.id, adminAppUai.id, kvGetSecretRole)
   scope: keyVault
   properties: {
     roleDefinitionId: kvGetSecretRole
-    principalId: uai.properties.principalId
+    principalId: adminAppUai.properties.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+// Add RBAC role for user assigned inentity to get secret from Key Vault
+resource chatbotAppUaiKeyVaultRbac 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(keyVault.id, chatbotAppUai.id, kvGetSecretRole)
+  scope: keyVault
+  properties: {
+    roleDefinitionId: kvGetSecretRole
+    principalId: chatbotAppUai.properties.principalId
     principalType: 'ServicePrincipal'
   }
 }
@@ -95,7 +128,7 @@ resource adminContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {
-      '${uai.id}': {}
+      '${adminAppUai.id}': {}
     }
   }
   tags: {
@@ -109,17 +142,17 @@ resource adminContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
         {
           name: 'connectionstrings-postgres-kv'
           keyVaultUrl: 'https://${keyVault.name}.vault.azure.net/secrets/ConnectionString-Fott-Administration-Postgres'
-          identity: uai.id
+          identity: adminAppUai.id
         }
         {
           name: 'connectionstrings-azureservicebus-kv'
           keyVaultUrl: 'https://${keyVault.name}.vault.azure.net/secrets/ConnectionString-Fott-ServiceBus'
-          identity: uai.id
+          identity: adminAppUai.id
         }
         {
           name: 'connectionstrings-applicationinsights-kv'
           keyVaultUrl: 'https://${keyVault.name}.vault.azure.net/secrets/ConnectionString-Fott-AppInsights'
-          identity: uai.id
+          identity: adminAppUai.id
         }
       ]
       ingress: {
@@ -134,7 +167,7 @@ resource adminContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
       }
       registries: [
         {
-          identity: uai.id
+          identity: adminAppUai.id
           server: containerRegistry.properties.loginServer
         }
       ]
@@ -194,7 +227,7 @@ resource chatbotContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {
-      '${uai.id}': {}
+      '${chatbotAppUai.id}': {}
     }
   }
   tags: {
@@ -208,7 +241,7 @@ resource chatbotContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
         {
           name: 'connectionstrings-applicationinsights-kv'
           keyVaultUrl: 'https://${keyVault.name}.vault.azure.net/secrets/ConnectionString-Fott-AppInsights'
-          identity: uai.id
+          identity: chatbotAppUai.id
         }
       ]
       ingress: {
@@ -223,7 +256,7 @@ resource chatbotContainerApp 'Microsoft.App/containerApps@2024-03-01' = {
       }
       registries: [
         {
-          identity: uai.id
+          identity: chatbotAppUai.id
           server: containerRegistry.properties.loginServer
         }
       ]
